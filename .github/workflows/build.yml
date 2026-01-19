@@ -10,35 +10,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Maximize Disk Space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          sudo rm -rf /usr/local/lib/android # Удаляем предустановленный SDK, Buildozer скачает свой
-          df -h
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # Этот экшен использует Docker-контейнер, где всё уже настроено
+      - name: Buildozer Android Build
+        uses: ArtemSBulgakov/buildozer-action@v1
         with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libffi-dev libssl-dev python3-dev zip unzip libtool pkg-config cmake autoconf automake libncurses5-dev libncursesw5-dev zlib1g-dev
-          pip install --upgrade pip
-          pip install buildozer "cython<3.0"
-
-      - name: Build with Buildozer
-        run: |
-          yes | buildozer android debug
-        env:
-          BUILDOZER_WARN_ON_ROOT: 0
+          buildozer_version: stable
+          command: buildozer android debug
+          repository_display_name: MyFinalMap
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: my-app-bundle
+          name: sk42map-apk
           path: bin/*.apk
