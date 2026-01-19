@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -31,8 +31,15 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          buildozer android clean
-          yes | buildozer android debug
+          # Проверяем, что файл на месте, и только потом запускаем
+          if [ -f buildozer.spec ]; then
+            buildozer android clean
+            yes | buildozer android debug
+          else
+            echo "Ошибка: buildozer.spec не найден в текущей папке!"
+            ls -R
+            exit 1
+          fi
         env:
           BUILDOZER_WARN_ON_ROOT: 0
 
