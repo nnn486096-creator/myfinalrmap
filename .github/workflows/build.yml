@@ -10,13 +10,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Этот экшен использует Docker-контейнер, где всё уже настроено
-      - name: Buildozer Android Build
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/local/lib/android
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          buildozer_version: stable
-          command: buildozer android debug
-          repository_display_name: MyFinalMap
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libffi-dev libssl-dev python3-dev zip unzip libtool pkg-config cmake autoconf automake libncurses5-dev libncursesw5-dev zlib1g-dev
+          pip install --upgrade pip
+          pip install "buildozer==1.5.0" "cython<3.0"
+
+      - name: Build with Buildozer
+        run: |
+          # Сначала только подготавливаем рецепты и SDK
+          buildozer android p4a -- clean_builds
+          # Теперь запускаем основную сборку
+          yes | buildozer android debug
+        env:
+          BUILDOZER_WARN_ON_ROOT: 0
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
