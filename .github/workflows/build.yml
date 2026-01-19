@@ -31,15 +31,7 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # Проверяем, что файл на месте, и только потом запускаем
-          if [ -f buildozer.spec ]; then
-            buildozer android clean
-            yes | buildozer android debug
-          else
-            echo "Ошибка: buildozer.spec не найден в текущей папке!"
-            ls -R
-            exit 1
-          fi
+          yes | buildozer android debug
         env:
           BUILDOZER_WARN_ON_ROOT: 0
 
