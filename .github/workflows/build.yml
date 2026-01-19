@@ -10,11 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free Disk Space
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
-          sudo rm -rf /usr/local/lib/android
-          df -h
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,9 +30,7 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # Сначала только подготавливаем рецепты и SDK
-          buildozer android p4a -- clean_builds
-          # Теперь запускаем основную сборку
+          # Мы не удаляем SDK, а заставляем Buildozer использовать правильные пути
           yes | buildozer android debug
         env:
           BUILDOZER_WARN_ON_ROOT: 0
