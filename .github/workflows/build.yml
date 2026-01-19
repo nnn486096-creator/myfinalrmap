@@ -10,9 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Free Space
-        run: sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost"
-        
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -21,12 +25,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libffi-dev libssl-dev python3-dev zip unzip libtool pkg-config cmake autoconf automake
+          sudo apt-get install -y build-essential libffi-dev libssl-dev python3-dev zip unzip libtool pkg-config cmake autoconf automake libncurses5-dev libncursesw5-dev zlib1g-dev
           pip install --upgrade pip
-          pip install buildozer cython==0.29.33
+          pip install buildozer "cython<3.0"
 
       - name: Build with Buildozer
-        run: yes | buildozer android debug
+        run: |
+          buildozer android clean
+          yes | buildozer android debug
+        env:
+          BUILDOZER_WARN_ON_ROOT: 0
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
