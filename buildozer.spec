@@ -6,7 +6,6 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
-# ВАЖНО: pyproj удален, используем math в main.py
 requirements = python3,kivy==2.2.1,pillow,certifi,openssl
 
 android.permissions = INTERNET
